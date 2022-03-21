@@ -1,4 +1,6 @@
 const collegeModel = require("../models/collegeModel")
+
+
 const isValid= function(value){
     if( typeof (value)=== 'undefined' || typeof (value)=== 'null'){
         return false
@@ -15,28 +17,33 @@ const isValid= function(value){
   
   const createCollege = async function (req, res) {
     try {
-      const data = req.body
-      if (!isValidRequestBody(data)) {
+      const requestBody = req.body
+      if (!isValidRequestBody(requestBody)) {
         res.status(400).send({ status: false, message: 'Invalid request parameters. Please provide college detalls' })
         return
       }
 
-  
-     
-  const {name,fullName,logoLink}=data
+  const {name,fullName,logoLink}=requestBody
+
       //  checking if any data field is empty or has no value
-      if( !isValid(data.name) )    return res.status(400).send({ status : false, msg: 'please provide name'})
-      if( !isValid(data.fullName) )    return res.status(400).send({ status : false, msg: 'please provide full name'})    
-      if( !isValid(data.logoLink) )    return res.status(400).send({ status : false, msg: 'please provide logo link'})
+      if( !isValid(name) )    return res.status(400).send({ status : false, msg: 'please provide name'})
+      if( !isValid(fullName) )    return res.status(400).send({ status : false, msg: 'please provide full name'})    
+      if( !isValid(logoLink) )    return res.status(400).send({ status : false, msg: 'please provide logo link'})
+
       //checking name is taken or not
     const nameCheck= await collegeModel.findone({name})
     if(nameCheck) return res.status(400).send({status:false,message:'name is already used'})
-    //checking lowercase
-    //const regex = /^([a-z]+)$/;
-    //if(!regex.test(name)) return res.status(400).send({status:false,message:'please enter name in lower case'})
+   
+    const regex = /^([a-z]+)$/;
+    if(!regex.test(name)) return res.status(400).send({status:false,message:'please enter name in lower case'})
 
-      const createCollege = await collegeModel.create(data)
-      res.status(201).send({ data: createCollege })
+
+    requestBody["name"]= name.trim()
+    requestBody["fullName"]= fullName.trim()
+    requestBody["logoLink"]= logoLink.trim()
+
+      const createCollege = await collegeModel.create(requestBody)
+      res.status(201).send({ status:true,message:"Created Successfully" ,data: createCollege })
     }
     catch (err) {
       console.log(err)
