@@ -38,9 +38,9 @@ const isValid= function(value){
           res.status(400).send({status:false,message:'please enter collegename' })
         }
 
-      
+        const emailRegex = /^([a-zA-Z0-9\.-]+)@([a-zA-Z0-9-]+).([a-z]+)$/;
     
-        if(!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+        if(!emailRegex.test(email)) {
           return res.status(400).send({
               status: false, message: `${email} is not a valid email`,
           });
@@ -51,8 +51,9 @@ const isValid= function(value){
           return res.status(400).send({ status: false, message: `${email} is already registered` });
       }
 
+       const mobileRegex = /^([0-9]){10}$/;
 
-      if (!/^(\+\d{1,3}[- ]?)?\d{10}$/.test(mobile)) {
+      if (!mobileRegex.test(mobile)) {
         return res.status(400).send({
             status: false, message: `${mobile} is not a valid mobile number`,
         });
@@ -79,3 +80,11 @@ const isValid= function(value){
     }
   }
   module.exports.createIntern =createIntern
+
+
+
+  //------------------------------------------------------------------------------------------------------------------------------//
+
+
+
+

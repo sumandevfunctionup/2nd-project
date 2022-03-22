@@ -51,3 +51,44 @@ const isValid= function(value){
     }
   }
   module.exports.createCollege =createCollege 
+  
+
+  //---------------------------------------------------------------------------------------------------------------------//
+  const  collegeDetails = async function(req,res){
+       try{
+          
+        const  queryParams = req.query
+        if(!isValid(queryParams)) {
+         res.status(400).send({status:false,message:"'Invalid request parameters. Please provide details' "})
+        }
+        const collegeName = req.query.collegeName
+        if(!isValid(collegeName)) {
+          res.status(400).send({status:false,message:"'Invalid request parameters. Please provide collegeName' "})
+         }
+
+        const details = await collegeModel.find({name:collegeName,isDeleted:false})
+        if(!details){
+          res.status(400).send({status:false,message:"please provide valid collegeName"})
+        }
+        const collegeId = details._id
+        const internDetails = await internModel.find({collegeId:collegeId,isDeleted:false})
+        if(!internDetails){
+          res.status(404).send({status:false,message:"no intern found"})
+        }
+
+
+        const finalData= {
+          "name":details.name,
+          "fullName":details.fullName,
+          "logoLink":details.logoLink,
+          "interests":internDetails
+        }
+
+        res.status(200).send({status:true,data:finalData})
+
+
+       }catch(error){
+         res.status(500).send({status:false,message:error.message})
+       }
+
+  }
