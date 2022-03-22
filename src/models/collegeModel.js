@@ -19,7 +19,7 @@ const collegeSchema = new mongoose.Schema( {
     },
     isDeleted:{
         type:Boolean,
-        defualt:false
+        default:false
     }
     
     
