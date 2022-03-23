@@ -22,7 +22,7 @@ const createIntern = async function (req, res) {
     const requestBody = req.body
 
     if (!isValidRequestBody(requestBody)) {
-      res.status(400).send({ status: false, message: 'Invalid request parameters. Please provide college detalls' })
+     return  res.status(400).send({ status: false, message: 'Invalid request parameters. Please provide college detalls' })
     }
 
     const { name, email, mobile, collegeName } = requestBody
@@ -34,20 +34,21 @@ const createIntern = async function (req, res) {
 
     //validation from input
     if (!isValid(finalQuery.name)) {
-      res.status(400).send({ status: false, message: 'please enter name' })
+     return  res.status(400).send({ status: false, message: 'please enter name' })
     }
     if (!isValid(finalQuery.email)) {
-      res.status(400).send({ status: false, message: 'please enter email' })
+     return  res.status(400).send({ status: false, message: 'please enter email' })
     }
     if (!mobile) {
-      res.status(400).send({ status: false, message: 'please enter mobile' })
+    return  res.status(400).send({ status: false, message: 'please enter mobile' })
     }
     if (!isValid(trimedCollegeName)) {
-      res.status(400).send({ status: false, message: 'please enter collegename' })
+     return res.status(400).send({ status: false, message: 'please enter collegename' })
     }
 
     //validation for email
     const emailRegex = /^([a-zA-Z0-9\.-]+)@([a-zA-Z0-9-]+).([a-z]+)$/;
+
 
     if (!emailRegex.test(finalQuery.email)) {
       return res.status(400).send({
@@ -78,15 +79,17 @@ const createIntern = async function (req, res) {
 
     // checking collegeName exist or not 
     const findCollegeId = await collegeModel.find({ name: trimedCollegeName, isDeleted: false })
-    if (!findCollegeId) {
-      res.send(404).status({ status: false, message: "no colleges found" })
+    if (!findCollegeId.length) {
+     return res.status(404).send({ status: false, message: "no college found" })
     }
     
     const collegeId = findCollegeId[0]._id
     finalQuery["collegeId"] = collegeId
 
     const internCreation = await internModel.create(finalQuery)
-    res.status(200).send({ status: true, message: "successfully created", data: internCreation })
+
+
+    res.status(201).send({ status: true, message: "successfully created", data:{name:internCreation.name,email:internCreation.email,mobile:internCreation.mobile,collegeId:internCreation.collegeId}})
 
   } catch (error) {
     res.status(500).send({ status: false, message: error.message })

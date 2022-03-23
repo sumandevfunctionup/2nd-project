@@ -20,7 +20,7 @@ const createCollege = async function (req, res) {
   try {
     let requestBody = req.body
     if (!isValidRequestBody(requestBody)) {
-      res.status(400).send({ status: false, message: 'Invalid request parameters. Please provide college detalls' })
+       return res.status(400).send({ status: false, message: 'Invalid request parameters. Please provide college detalls' })
 
     }
     let { name, fullName, logoLink } = requestBody
@@ -43,7 +43,7 @@ const createCollege = async function (req, res) {
     if (nameCheck) return res.status(400).send({ status: false, message: 'name is already used' })
 
     const createCollege = await collegeModel.create(requestBody)
-    res.status(201).send({ status: true, message: "Created Successfully", data: createCollege })
+    res.status(201).send({ status: true, message: "Created Successfully", data: {name:createCollege.name,fullName:createCollege.fullName,logoLink:createCollege.logoLink  } })
   }
   catch (err) {
     console.log(err)
@@ -60,23 +60,23 @@ const collegeDetails = async function (req, res) {
 
     const queryParams = req.query
     if (!queryParams) {
-      res.status(400).send({ status: false, message: "'Invalid request parameters. Please provide details' " })
+     return  res.status(400).send({ status: false, message: "'Invalid request parameters. Please provide details' " })
     }
     const collegeName = req.query.collegeName
     if (!isValid(collegeName)) {
-      res.status(400).send({ status: false, message: "'Invalid request parameters. Please provide collegeName' " })
+       return res.status(400).send({ status: false, message: "'Invalid request parameters. Please provide collegeName' " })
     }
 
     // checking collegeName exist or not
     const details = await collegeModel.find({ name: collegeName, isDeleted: false })
     if (!details.length) {
-      res.status(400).send({ status: false, message: "please provide valid collegeName" })
+     return  res.status(400).send({ status: false, message: "please provide valid collegeName" })
     }
     console.log(details)
     const collegeId = details[0]._id
-    const internDetails = await internModel.find({ collegeId: collegeId, isDeleted: false })
-    if (!internDetails) {
-      res.status(404).send({ status: false, message: "no intern found" })
+    const internDetails = await internModel.find({ collegeId: collegeId, isDeleted: false }).select({createdAt:0,updatedAt:0,__v:0})
+    if (!internDetails.length) {
+     return   res.status(404).send({ status: false, message: "no intern found" })
 
     }
 
