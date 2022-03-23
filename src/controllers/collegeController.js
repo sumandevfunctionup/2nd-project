@@ -18,12 +18,12 @@ const isValidRequestBody = function (requestBody) {
 
 const createCollege = async function (req, res) {
   try {
-    const requestBody = req.body
+    let requestBody = req.body
     if (!isValidRequestBody(requestBody)) {
       res.status(400).send({ status: false, message: 'Invalid request parameters. Please provide college detalls' })
 
     }
-    const { name, fullName, logoLink } = requestBody
+    let { name, fullName, logoLink } = requestBody
 
     // removeing any space
     requestBody["name"] = name.toLowerCase().trim()   // changing any upperCase letter to lowerCase 
@@ -38,7 +38,8 @@ const createCollege = async function (req, res) {
     if (!isValid(logoLink)) return res.status(400).send({ status: false, msg: 'please provide logo link' })
 
     //checking name is taken or not
-    const nameCheck = await collegeModel.findOne({ name })
+    const trimedName= name.trim()
+    const nameCheck = await collegeModel.findOne({ name:trimedName })
     if (nameCheck) return res.status(400).send({ status: false, message: 'name is already used' })
 
     const createCollege = await collegeModel.create(requestBody)
@@ -53,6 +54,7 @@ module.exports.createCollege = createCollege
 
 
 //---------------------------------------------------------------------------------------------------------------------//
+
 const collegeDetails = async function (req, res) {
   try {
 
@@ -70,10 +72,12 @@ const collegeDetails = async function (req, res) {
     if (!details.length) {
       res.status(400).send({ status: false, message: "please provide valid collegeName" })
     }
+    console.log(details)
     const collegeId = details[0]._id
     const internDetails = await internModel.find({ collegeId: collegeId, isDeleted: false })
     if (!internDetails) {
       res.status(404).send({ status: false, message: "no intern found" })
+
     }
 
 
